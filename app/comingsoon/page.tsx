@@ -114,7 +114,7 @@ export default function ComingSoon() {
 
             {/* Subheading */}
             <p className="text-base md:text-xl text-[#4A4A4A] mb-8 md:mb-12 leading-relaxed max-w-xl mx-auto px-2">
-              We're putting the finishing touches on something special. 
+              We&apos;re putting the finishing touches on something special. 
               UniWell will launch in the coming weeks.
             </p>
 
@@ -146,7 +146,7 @@ export default function ComingSoon() {
                 </p>
               )}
               <p className="text-xs md:text-sm text-[#4A4A4A]">
-                We'll notify you when we launch and share exclusive updates
+                We&apos;ll notify you when we launch and share exclusive updates
               </p>
             </form>
           </>
@@ -163,11 +163,11 @@ export default function ComingSoon() {
                 className="text-2xl md:text-4xl font-bold text-[#212121] mb-3 md:mb-4"
                 style={{ fontFamily: 'Helvetica' }}
               >
-                You're on the list!
+                You&apos;re on the list!
               </h2>
               
               <p className="text-base md:text-lg text-[#4A4A4A] mb-4 md:mb-6">
-                Thanks for joining our waitlist. We'll send you an email at{' '}
+                Thanks for joining our waitlist. We&apos;ll send you an email at{' '}
                 <span className="font-semibold text-[#212121] break-all">{email}</span> when we launch.
               </p>
               
