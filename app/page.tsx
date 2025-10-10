@@ -1,103 +1,374 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Footer from '../components/Footer';
+import Image from 'next/image';
+import { CheckIcon, BookOpenTextIcon, HeartStraightIcon, UsersThreeIcon, X } from '@phosphor-icons/react';
+import QRCode from 'react-qr-code';
+
+// Mock data for slides (you can move this to a separate file)
+const onboardingSlides = [
+  {
+    id: 'slide1',
+    title: 'Boost Your Productivity',
+    description: 'Stay on track with study timers, focus sessions, and goal tracking tools.',
+    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/productivityillustration-removebg.png',
+    backgroundColor: '#E6F3FF',
+    icon: 'check-circle',
+  },
+  {
+    id: 'slide2',
+    title: 'Professional Support',
+    description: 'Book counseling appointments, browse mental health resources, and access crisis support.',
+    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/caregiver-prod.png',
+    backgroundColor: '#FFF1E6',
+    icon: 'heart',
+  },
+  {
+    id: 'slide3',
+    title: 'Join the Community',
+    description: 'Connect with peers through discussion forums, group activities, and anonymous sharing.',
+    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/communityillustration-removebg.png',
+    backgroundColor: '#E6FFE9',
+    icon: 'users',
+  },
+  {
+    id: 'slide4',
+    title: 'Learn & Grow',
+    description: 'Access resources, workshops, and tools to support your mental wellness journey.',
+    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/selfcareillustration-removebg.png',
+    backgroundColor: '#FFE6F0',
+    icon: 'book',
+  },
+];
+
+interface Position {
+  rotate: number;
+  translateX: number;
+  translateY: number;
+  zIndex: number;
+  scale: number;
+  opacity: number;
+}
+
+// Icon component using Phosphor icons
+const Icon = ({ name, size = 32, className = '' }: { name: string; size?: number; className?: string }) => {
+  const iconProps = { size, className, weight: 'bold' as const };
+  
+  switch (name) {
+    case 'check-circle':
+      return <CheckIcon {...iconProps} />;
+    case 'heart':
+      return <HeartStraightIcon {...iconProps} />;
+    case 'users':
+      return <UsersThreeIcon {...iconProps} />;
+    case 'book':
+      return <BookOpenTextIcon {...iconProps} />;
+    default:
+      return <CheckIcon {...iconProps} />;
+  }
+};
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [slides] = useState(onboardingSlides);
+  const [isAnimated, setIsAnimated] = useState(false);
+  const [mockupPositions, setMockupPositions] = useState<Position[]>([]);
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // Initialize animations
+  useEffect(() => {
+    setIsAnimated(true);
+    setMockupPositions(getMockupPositions(0));
+    
+    // Check if mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const safeSlidesForAnimation = slides.slice(0, 4);
+
+  const downloadUrl = 'https://uniwell.seanmotanya.dev/comingsoon';
+
+  const handleGetStarted = () => {
+    setShowDownloadDialog(true);
+  };
+
+  const handleDownload = () => {
+    window.open(downloadUrl, '_blank');
+  };
+
+  // Function to handle advancing to the next mockup
+  const handleNextMockup = () => {
+    if (!safeSlidesForAnimation.length) return;
+    const maxIndex = safeSlidesForAnimation.length - 1;
+    const nextIndex = activeIndex >= maxIndex ? 0 : activeIndex + 1;
+    setActiveIndex(nextIndex);
+    setMockupPositions(getMockupPositions(nextIndex));
+  };
+
+  // Function to handle selecting a specific mockup
+  const handleSelectMockup = (index: number) => {
+    if (!safeSlidesForAnimation.length) return;
+    if (index !== activeIndex) {
+      setActiveIndex(index);
+      setMockupPositions(getMockupPositions(index));
+    }
+  };
+
+  // Enhanced getMockupPositions function for improved stacking and visibility
+  const getMockupPositions = (activeIdx: number): Position[] => {
+    const largeSpread = 220;
+    
+    // Using a higher z-index value for active item to ensure it's always on top
+    const ACTIVE_Z_INDEX = 10;
+    const BEHIND_Z_INDEX = 3;
+    const FAR_BEHIND_Z_INDEX = 2;
+    const FARTHEST_Z_INDEX = 1;
+    
+    if (activeIdx === 0) {
+      return [
+        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
+        { rotate: 12, translateX: largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+        { rotate: 20, translateX: largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
+        { rotate: 28, translateX: largeSpread * 2.2, translateY: 120, zIndex: FARTHEST_Z_INDEX, scale: 0.65, opacity: 0.5 },
+      ];
+    } else if (activeIdx === 1) {
+      return [
+        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
+        { rotate: 12, translateX: largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+        { rotate: 20, translateX: largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
+      ];
+    } else if (activeIdx === 2) {
+      return [
+        { rotate: -20, translateX: -largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
+        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
+        { rotate: 12, translateX: largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+      ];
+    } else if (activeIdx === 3) {
+      return [
+        { rotate: -28, translateX: -largeSpread * 2.2, translateY: 120, zIndex: FARTHEST_Z_INDEX, scale: 0.65, opacity: 0.5 },
+        { rotate: -20, translateX: -largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
+        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
+      ];
+    } else {
+      return [
+        { rotate: -28, translateX: -largeSpread * 2.2, translateY: 120, zIndex: FARTHEST_Z_INDEX, scale: 0.65, opacity: 0.5 },
+        { rotate: -20, translateX: -largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
+        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
+        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
+      ];
+    }
+  };
+
+  const renderMockups = () => {
+    if (!safeSlidesForAnimation.length || mockupPositions.length === 0) {
+      return <div className="h-[700px] w-full relative flex items-center justify-center" />;
+    }
+    
+    return (
+      <div className="h-[700px] w-full relative flex items-center justify-center mb-5">
+        {safeSlidesForAnimation.map((slide, index) => {
+          const position = mockupPositions[index] || { rotate: 0, translateX: 0, translateY: 0, zIndex: 1, scale: 1, opacity: 1 };
+          
+          return (
+            <button
+              key={slide.id}
+              onClick={() => handleSelectMockup(index)}
+              className="absolute cursor-pointer transition-all duration-[650ms] ease-out"
+              style={{
+                transform: `translateX(${position.translateX}px) translateY(${position.translateY}px) rotate(${position.rotate}deg) scale(${position.scale})`,
+                zIndex: position.zIndex,
+                opacity: position.opacity,
+              }}
+            >
+              <div
+                className={`transition-shadow duration-300 ${
+                  index === activeIndex
+                    ? 'shadow-[0_20px_30px_rgba(0,0,0,0.3)]'
+                    : 'shadow-[0_12px_20px_rgba(0,0,0,0.2)]'
+                }`}
+              >
+                {/* Mockup with image */}
+                <div
+                  className="w-[300px] h-[500px] rounded-3xl p-6 flex flex-col items-center justify-center overflow-hidden"
+                  style={{ backgroundColor: index === 0 ? '#ffa07a' : '#212121' }}
+                >
+                  <div className="w-full flex-1 flex items-center justify-center mb-4">
+                    <Image
+                      src={slide.imageSource}
+                      alt={slide.title}
+                      width={200}
+                      height={200}
+                      className="object-contain"
+                    />
+                  </div>
+                  <h3 className="text-white text-xl font-bold mb-2 text-center">{slide.title}</h3>
+                  <p className="text-white/80 text-sm text-center line-clamp-3">{slide.description}</p>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+        
+        {/* Next button */}
+        <div className="absolute bottom-[30px] z-20">
+          <button
+            onClick={handleNextMockup}
+            className="bg-[#212121] w-[60px] h-[60px] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:translate-y-1"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <span className="text-white text-2xl font-bold">→</span>
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+    );
+  };
+  
+  return (
+    <main className="flex-1 bg-[#fbeee3] min-h-screen">
+      <div className="pb-[60px]">
+        {/* Logo Header */}
+        <header className="absolute top-5 left-10 z-10">
+          <div className="flex flex-row items-center">
+            <Image
+              src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/uniwell-logo-nobg.png"
+              alt="UniWell Logo"
+              width={40}
+              height={40}
+            />
+            <h1 className="text-2xl font-semibold   text-[#212121] ml-2" style={{ fontFamily: 'Helvetica' }}>UniWell</h1>
+          </div>
+        </header>
+
+        <div className="flex-1 flex items-center flex-col p-5">
+          {/* Header Section */}
+          <div className={`mt-[120px] mb-[60px] flex items-center justify-center max-w-[900px] w-full px-5 mx-auto transition-all duration-800 ${isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
+            <div className="w-full">
+              <h2 className="text-5xl font-bold text-center w-full mb-4 text-[#212121] tracking-tight" style={{ fontFamily: 'Helvetica' }}>
+                Mental Wellness for Students
+              </h2>
+              <p className="text-xl text-center text-[#4A4A4A] leading-[30px] max-w-[700px] w-full mx-auto font-normal">
+                Tools and resources to help students thrive academically and emotionally
+              </p>
+            </div>
+          </div>
+
+          {/* Mockups Section */}
+          {renderMockups()}
+
+          {/* CTA Buttons */}
+          <div className="flex flex-row justify-center gap-4 my-12 flex-wrap">
+            <button 
+              onClick={handleGetStarted}
+              className="px-8 py-4 bg-[#212121] text-white rounded-full font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl"
+            >
+              Get Started →
+            </button>
+            <button className="px-8 py-4 bg-white text-[#212121] rounded-full font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121]">
+              Learn More
+            </button>
+          </div>
+
+          {/* Features Section */}
+          <div className="flex flex-row flex-wrap justify-center max-w-[1200px] my-[60px] gap-8">
+            {slides.map((slide, index) => (
+              <div key={slide.id} className="w-[300px] p-5 flex items-center flex-col">
+                <div
+                  className="w-16 h-16 rounded-full mb-6 flex justify-center items-center"
+                  style={{ backgroundColor: index === 0 ? '#ffa07a' : '#212121' }}
+                >
+                  <Icon name={slide.icon} size={32} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-center text-[#212121]">
+                  {slide.title}
+                </h3>
+                <p className="text-base text-center text-[#4A4A4A] leading-6">
+                  {slide.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-10 mx-5 pb-10">
+          <Footer />
+        </div>
+      </div>
+
+      {/* Download Dialog */}
+      {showDownloadDialog && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowDownloadDialog(false)}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <div 
+            className="bg-[#fbeee3] rounded-3xl shadow-2xl max-w-md w-full p-8 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowDownloadDialog(false)}
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X size={24} weight="bold" className="text-[#212121]" />
+            </button>
+
+            {/* Dialog content */}
+            <div className="flex flex-col items-center pt-4">
+              <h3 className="text-2xl font-bold text-[#212121] mb-2 text-center" style={{ fontFamily: 'Helvetica' }}>
+                Download UniWell
+              </h3>
+              <Image
+                src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/uniwell-logo-nobg.png"
+                alt="UniWell Logo"
+                width={60}
+                height={60}
+                className="mb-4"
+              />
+              <p className="text-[#4A4A4A] text-center mb-8">
+                {isMobile ? 'Tap the button below to download' : 'Scan the QR code with your phone'}
+              </p>
+
+              {isMobile ? (
+                // Mobile: Show download button
+                <div className="w-full">
+                  <button
+                    onClick={handleDownload}
+                    className="w-full px-8 py-4 bg-[#212121] text-white rounded-full font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl"
+                  >
+                    Download Now
+                  </button>
+                </div>
+              ) : (
+                // Desktop: Show QR code
+                <div className="bg-white p-6 rounded-2xl border-2 border-gray-200">
+                  <QRCode
+                    value={downloadUrl}
+                    size={200}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    viewBox={`0 0 200 200`}
+                  />
+                </div>
+              )}
+
+              <p className="text-sm text-[#4A4A4A] mt-6 text-center">
+                Available for iOS and Android
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }
