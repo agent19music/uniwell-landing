@@ -186,8 +186,8 @@ export default function ComingSoon() {
       <footer className="absolute bottom-4 md:bottom-8 text-center w-full px-4">
         <p className="text-xs md:text-sm text-[#4A4A4A]">
           Questions? Reach us at{' '}
-          <a href="mailto:hello@uniwell.com" className="text-[#212121] font-semibold hover:underline">
-            hello@uniwell.com
+          <a href="mailto:seanmotanya@gmail.com" className="text-[#212121] font-semibold hover:underline">
+            seanmotanya@gmail.com
           </a>
         </p>
       </footer>
