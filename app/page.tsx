@@ -98,7 +98,12 @@ export default function Home() {
   const downloadUrl = 'https://uniwell.seanmotanya.dev/comingsoon';
 
   const handleGetStarted = () => {
-    setShowDownloadDialog(true);
+    // On mobile, redirect to coming soon page
+    if (isMobile) {
+      window.location.href = 'https://uniwell.seanmotanya.dev/comingsoon';
+    } else {
+      setShowDownloadDialog(true);
+    }
   };
 
   const handleDownload = () => {
@@ -173,11 +178,11 @@ export default function Home() {
 
   const renderMockups = () => {
     if (!safeSlidesForAnimation.length || mockupPositions.length === 0) {
-      return <div className="h-[700px] w-full relative flex items-center justify-center" />;
+      return <div className="h-[500px] md:h-[600px] lg:h-[700px] w-full relative flex items-center justify-center" />;
     }
     
     return (
-      <div className="h-[700px] w-full relative flex items-center justify-center mb-5">
+      <div className="h-[500px] md:h-[600px] lg:h-[700px] w-full relative flex items-center justify-center mb-5 scale-75 md:scale-90 lg:scale-100">
         {safeSlidesForAnimation.map((slide, index) => {
           const position = mockupPositions[index] || { rotate: 0, translateX: 0, translateY: 0, zIndex: 1, scale: 1, opacity: 1 };
           
@@ -201,20 +206,20 @@ export default function Home() {
               >
                 {/* Mockup with image */}
                 <div
-                  className="w-[300px] h-[500px] rounded-3xl p-6 flex flex-col items-center justify-center overflow-hidden"
+                  className="w-[280px] md:w-[300px] h-[450px] md:h-[500px] rounded-3xl p-5 md:p-6 flex flex-col items-center justify-center overflow-hidden"
                   style={{ backgroundColor: index === 0 ? '#ffa07a' : '#212121' }}
                 >
-                  <div className="w-full flex-1 flex items-center justify-center mb-4">
+                  <div className="w-full flex-1 flex items-center justify-center mb-3 md:mb-4">
                     <Image
                       src={slide.imageSource}
                       alt={slide.title}
-                      width={200}
-                      height={200}
-                      className="object-contain"
+                      width={180}
+                      height={180}
+                      className="object-contain md:w-[200px] md:h-[200px]"
                     />
                   </div>
-                  <h3 className="text-white text-xl font-bold mb-2 text-center">{slide.title}</h3>
-                  <p className="text-white/80 text-sm text-center line-clamp-3">{slide.description}</p>
+                  <h3 className="text-white text-lg md:text-xl font-bold mb-2 text-center">{slide.title}</h3>
+                  <p className="text-white/80 text-xs md:text-sm text-center line-clamp-3">{slide.description}</p>
                 </div>
               </div>
             </button>
@@ -225,9 +230,9 @@ export default function Home() {
         <div className="absolute bottom-[30px] z-20">
           <button
             onClick={handleNextMockup}
-            className="bg-[#212121] w-[60px] h-[60px] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:translate-y-1"
+            className="bg-[#212121] w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:translate-y-1"
           >
-            <span className="text-white text-2xl font-bold">→</span>
+            <span className="text-white text-xl md:text-2xl font-bold">→</span>
           </button>
         </div>
       </div>
@@ -239,25 +244,25 @@ export default function Home() {
       <div className="pb-[60px]">
         {/* Logo Header */}
         <header className="absolute top-5 left-10 z-10">
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center scale-75 md:scale-100 origin-left">
             <Image
               src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/uniwell-logo-nobg.png"
               alt="UniWell Logo"
               width={40}
               height={40}
             />
-            <h1 className="text-2xl font-semibold   text-[#212121] ml-2" style={{ fontFamily: 'Helvetica' }}>UniWell</h1>
+            <h1 className="text-xl md:text-2xl font-semibold text-[#212121] ml-2" style={{ fontFamily: 'Helvetica' }}>UniWell</h1>
           </div>
         </header>
 
         <div className="flex-1 flex items-center flex-col p-5">
           {/* Header Section */}
-          <div className={`mt-[120px] mb-[60px] flex items-center justify-center max-w-[900px] w-full px-5 mx-auto transition-all duration-800 ${isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
+          <div className={`mt-[100px] md:mt-[120px] mb-[50px] md:mb-[60px] flex items-center justify-center max-w-[900px] w-full px-5 mx-auto transition-all duration-800 ${isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
             <div className="w-full">
-              <h2 className="text-5xl font-bold text-center w-full mb-4 text-[#212121] tracking-tight" style={{ fontFamily: 'Helvetica' }}>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center w-full mb-3 md:mb-4 text-[#212121] tracking-tight" style={{ fontFamily: 'Helvetica' }}>
                 Mental Wellness for Students
               </h2>
-              <p className="text-xl text-center text-[#4A4A4A] leading-[30px] max-w-[700px] w-full mx-auto font-normal">
+              <p className="text-base md:text-lg lg:text-xl text-center text-[#4A4A4A] leading-[28px] max-w-[700px] w-full mx-auto font-normal">
                 Tools and resources to help students thrive academically and emotionally
               </p>
             </div>
@@ -267,32 +272,33 @@ export default function Home() {
           {renderMockups()}
 
           {/* CTA Buttons */}
-          <div className="flex flex-row justify-center gap-4 my-12 flex-wrap">
+          <div className="flex flex-row justify-center gap-3 md:gap-4 my-8 md:my-12 flex-wrap">
             <button 
               onClick={handleGetStarted}
-              className="px-8 py-4 bg-[#212121] text-white rounded-full font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl"
+              className="px-6 md:px-8 py-3 md:py-4 bg-[#212121] text-white rounded-full text-sm md:text-base font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl"
             >
               Get Started →
             </button>
-            <button className="px-8 py-4 bg-white text-[#212121] rounded-full font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121]">
+            <button className="px-6 md:px-8 py-3 md:py-4 bg-white text-[#212121] rounded-full text-sm md:text-base font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121]">
               Learn More
             </button>
           </div>
 
           {/* Features Section */}
-          <div className="flex flex-row flex-wrap justify-center max-w-[1200px] my-[60px] gap-8">
+          <div className="flex flex-row flex-wrap justify-center max-w-[1200px] my-[40px] md:my-[60px] gap-6 md:gap-8">
             {slides.map((slide, index) => (
-              <div key={slide.id} className="w-[300px] p-5 flex items-center flex-col">
+              <div key={slide.id} className="w-[280px] md:w-[300px] p-4 md:p-5 flex items-center flex-col">
                 <div
-                  className="w-16 h-16 rounded-full mb-6 flex justify-center items-center"
+                  className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-5 md:mb-6 flex justify-center items-center"
                   style={{ backgroundColor: index === 0 ? '#ffa07a' : '#212121' }}
                 >
-                  <Icon name={slide.icon} size={32} className="text-white" />
+                  <Icon name={slide.icon} size={28} className="text-white md:hidden" />
+                  <Icon name={slide.icon} size={32} className="text-white hidden md:block" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-center text-[#212121]">
+                <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-center text-[#212121]">
                   {slide.title}
                 </h3>
-                <p className="text-base text-center text-[#4A4A4A] leading-6">
+                <p className="text-sm md:text-base text-center text-[#4A4A4A] leading-6">
                   {slide.description}
                 </p>
               </div>
@@ -303,6 +309,18 @@ export default function Home() {
         {/* Footer */}
         <div className="mt-10 mx-5 pb-10">
           <Footer />
+          <div className="text-center mt-8">
+            <p className="text-md text-[#4A4A4A] flex items-center justify-center gap-2">
+              Made by an over caffeinated undergrad 
+              <Image 
+                src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/sean_pfp_peace-removebg-preview.png" 
+                alt="Sean" 
+                width={40} 
+                height={40} 
+                className="inline-block rounded-full" 
+              />
+            </p>
+          </div>
         </div>
       </div>
 
@@ -313,7 +331,7 @@ export default function Home() {
           onClick={() => setShowDownloadDialog(false)}
         >
           <div 
-            className="bg-[#fbeee3] rounded-3xl shadow-2xl max-w-md w-full p-8 relative"
+            className="bg-[#fbeee3] rounded-3xl shadow-2xl max-w-md w-full p-6 md:p-8 relative mx-auto my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -326,7 +344,7 @@ export default function Home() {
 
             {/* Dialog content */}
             <div className="flex flex-col items-center pt-4">
-              <h3 className="text-2xl font-bold text-[#212121] mb-2 text-center" style={{ fontFamily: 'Helvetica' }}>
+              <h3 className="text-xl md:text-2xl font-bold text-[#212121] mb-2 text-center" style={{ fontFamily: 'Helvetica' }}>
                 Download UniWell
               </h3>
               <Image
@@ -336,33 +354,21 @@ export default function Home() {
                 height={60}
                 className="mb-4"
               />
-              <p className="text-[#4A4A4A] text-center mb-8">
-                {isMobile ? 'Tap the button below to download' : 'Scan the QR code with your phone'}
+              <p className="text-[#4A4A4A] text-center mb-6 md:mb-8 text-sm md:text-base">
+                Scan the QR code with your phone
               </p>
 
-              {isMobile ? (
-                // Mobile: Show download button
-                <div className="w-full">
-                  <button
-                    onClick={handleDownload}
-                    className="w-full px-8 py-4 bg-[#212121] text-white rounded-full font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl"
-                  >
-                    Download Now
-                  </button>
-                </div>
-              ) : (
-                // Desktop: Show QR code
-                <div className="bg-white p-6 rounded-2xl border-2 border-gray-200">
-                  <QRCode
-                    value={downloadUrl}
-                    size={200}
-                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                    viewBox={`0 0 200 200`}
-                  />
-                </div>
-              )}
+              {/* Desktop: Show QR code */}
+              <div className="bg-white p-4 md:p-6 rounded-2xl border-2 border-gray-200">
+                <QRCode
+                  value={downloadUrl}
+                  size={200}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  viewBox={`0 0 200 200`}
+                />
+              </div>
 
-              <p className="text-sm text-[#4A4A4A] mt-6 text-center">
+              <p className="text-xs md:text-sm text-[#4A4A4A] mt-4 md:mt-6 text-center">
                 Available for iOS and Android
               </p>
             </div>

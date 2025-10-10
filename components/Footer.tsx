@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface FooterLinkProps {
   title: string;
@@ -6,7 +7,8 @@ interface FooterLinkProps {
 }
 
 const FooterLink: React.FC<FooterLinkProps> = ({ title, onClick }) => {
-  return (
+  const router = useRouter();
+      return (
     <button onClick={onClick} className="mb-3 text-left">
       <span className="text-[#AAAAAA] text-sm hover:text-white transition-colors">
         {title}
@@ -37,39 +39,40 @@ const FooterSection: React.FC<FooterSectionProps> = ({ title, links }) => {
 };
 
 const Footer: React.FC = () => {
+  const router = useRouter();
   const handleTherapistLogin = () => {
     // Navigate to therapist login
-    window.location.href = '/therapist/loginscreen';
+    router.push('/comingsoon'); 
   };
 
   const aboutLinks = [
-    { title: 'Principles', onClick: () => console.log('Principles pressed') },
-    { title: 'The Team', onClick: () => console.log('The Team pressed') },
-    { title: 'Roadmap', onClick: () => console.log('Roadmap pressed') },
-    { title: 'Building', onClick: () => console.log('Building pressed') },
-    { title: 'Testimonials', onClick: () => console.log('Testimonials pressed') },
+    { title: 'Principles', onClick: () => router.push('/comingsoon') },
+    { title: 'The Team', onClick: () => router.push('/comingsoon') },
+    { title: 'Roadmap', onClick: () => router.push('/comingsoon') },
+    { title: 'Building', onClick: () => router.push('/comingsoon') },
+    { title: 'Testimonials', onClick: () => router.push('/comingsoon') },
   ];
 
   const productLinks = [
-    { title: 'Features', onClick: () => console.log('Features pressed') },
-    { title: 'Use cases', onClick: () => console.log('Use cases pressed') },
-    { title: 'Creators', onClick: () => console.log('Creators pressed') },
-    { title: 'The future', onClick: () => console.log('The future pressed') },
-    { title: 'Pricing', onClick: () => console.log('Pricing pressed') },
+      { title: 'Features', onClick: () => router.push('/comingsoon') },
+    { title: 'Use cases', onClick: () => router.push('/comingsoon') },
+    { title: 'Creators', onClick: () => router.push('/comingsoon') },
+    { title: 'The future', onClick: () => router.push('/comingsoon') },
+    { title: 'Pricing', onClick: () => router.push('/comingsoon') },
     { title: 'Therapist Login', onClick: handleTherapistLogin },
   ];
 
   const legalLinks = [
-    { title: 'Privacy', onClick: () => console.log('Privacy pressed') },
-    { title: 'Terms', onClick: () => console.log('Terms pressed') },
-    { title: 'Cookies', onClick: () => console.log('Cookies pressed') },
-    { title: 'Legal Info', onClick: () => console.log('Legal Info pressed') },
+    { title: 'Privacy', onClick: () => router.push('/comingsoon') },
+    { title: 'Terms', onClick: () => router.push('/comingsoon') },
+    { title: 'Cookies', onClick: () => router.push('/comingsoon') },
+    { title: 'Legal Info', onClick: () => router.push('/comingsoon') },
   ];
 
   const socialLinks = [
-    { title: 'Instagram', onClick: () => console.log('Instagram pressed') },
-    { title: 'Discord', onClick: () => console.log('Discord pressed') },
-    { title: 'X (Twitter)', onClick: () => console.log('X (Twitter) pressed') },
+    { title: 'Instagram', onClick: () => router.push('/comingsoon') },
+    { title: 'Discord', onClick: () => router.push('/comingsoon') },
+    { title: 'X (Twitter)', onClick: () => router.push('/comingsoon') },
   ];
 
   return (
@@ -81,6 +84,7 @@ const Footer: React.FC = () => {
           <FooterSection title="Legal" links={legalLinks} />
           <FooterSection title="Social" links={socialLinks} />
         </div>
+        
       </div>
     </footer>
   );
