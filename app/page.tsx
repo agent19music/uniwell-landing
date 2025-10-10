@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Image from 'next/image';
 import { CheckIcon, BookOpenTextIcon, HeartStraightIcon, UsersThreeIcon, X } from '@phosphor-icons/react';
 import QRCode from 'react-qr-code';
+import { useRouter } from 'next/navigation';
 
 // Mock data for slides (you can move this to a separate file)
 const onboardingSlides = [
@@ -76,6 +77,7 @@ export default function Home() {
   const [mockupPositions, setMockupPositions] = useState<Position[]>([]);
   const [showDownloadDialog, setShowDownloadDialog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const router = useRouter();
 
   // Initialize animations
   useEffect(() => {
@@ -95,19 +97,17 @@ export default function Home() {
 
   const safeSlidesForAnimation = slides.slice(0, 4);
 
-  const downloadUrl = 'https://uniwell.seanmotanya.dev/comingsoon';
-
   const handleGetStarted = () => {
     // On mobile, redirect to coming soon page
     if (isMobile) {
-      window.location.href = 'https://uniwell.seanmotanya.dev/comingsoon';
+      router.push('/comingsoon');
     } else {
       setShowDownloadDialog(true);
     }
   };
 
   const handleDownload = () => {
-    window.open(downloadUrl, '_blank');
+    router.push('/comingsoon');
   };
 
   // Function to handle advancing to the next mockup
@@ -279,7 +279,9 @@ export default function Home() {
             >
               Get Started →
             </button>
-            <button className="px-6 md:px-8 py-3 md:py-4 bg-white text-[#212121] rounded-full text-sm md:text-base font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121]">
+            <button
+              onClick={() => router.push('/comingsoon')}
+            className="px-6 md:px-8 py-3 md:py-4 bg-white text-[#212121] rounded-full text-sm md:text-base font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121]">
               Learn More
             </button>
           </div>
@@ -361,7 +363,7 @@ export default function Home() {
               {/* Desktop: Show QR code */}
               <div className="bg-white p-4 md:p-6 rounded-2xl border-2 border-gray-200">
                 <QRCode
-                  value={downloadUrl}
+                  value={'https://uniwell.seanmotanya.dev/comingsoon'}
                   size={200}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                   viewBox={`0 0 200 200`}
