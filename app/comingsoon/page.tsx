@@ -180,10 +180,10 @@ export default function ComingSoon() {
         <p className="text-xs text-on-surface-variant">
           Questions? Reach us at{' '}
           <a
-            href="mailto:seanmotanya@gmail.com"
+            href="mailto:hello@uzskicorp.agency"
             className="font-bold text-primary hover:text-primary-dim transition-colors"
           >
-            seanmotanya@gmail.com
+            hello@uzskicorp.agency
           </a>
         </p>
       </footer>

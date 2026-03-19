@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Manrope } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -63,6 +64,7 @@ export default function RootLayout({
         className={`${plusJakarta.variable} ${manrope.variable} antialiased`}
       >
         {children}
+        <GoogleAnalytics gaId="G-YJW0SB7X6B" />
       </body>
     </html>
   );
