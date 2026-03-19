@@ -166,13 +166,7 @@ export default function Home() {
                   fatigue levels. Gamify your study habits without the burnout.
                 </p>
               </div>
-              <div className="mt-8 overflow-hidden rounded-lg h-32 bg-surface-container">
-                <div className="flex gap-2 p-4 animate-pulse">
-                  <div className="h-full w-24 bg-primary-container/20 rounded-lg" />
-                  <div className="h-full w-24 bg-primary-container/40 rounded-lg" />
-                  <div className="h-full w-32 bg-primary-container/60 rounded-lg" />
-                </div>
-              </div>
+             
             </div>
 
             {/* Professional Support */}
