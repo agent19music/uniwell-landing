@@ -14,9 +14,42 @@ const manrope = Manrope({
   weight: ["400", "500", "600"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://uniwell.seanmotanya.dev";
+const ogTitle = "Uniwell | Mental Wellness for Students";
+const ogDescription =
+  "Uniwell helps students manage stress, stay focused, and access support with tools built for campus life.";
+const ogImage = "/uniwell-logo.png";
+
 export const metadata: Metadata = {
-  title: "Uniwell | Mental Wellness & Productivity",
-  description: "Turn academic stress into manageable steps. Uniwell combines focus timers, peer community, and professional support in one app built for your brain.",
+  metadataBase: new URL(siteUrl),
+  title: ogTitle,
+  description: ogDescription,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: ogTitle,
+    description: ogDescription,
+    siteName: "Uniwell",
+    images: [
+      {
+        url: ogImage,
+        alt: "Uniwell logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: ogTitle,
+    description: ogDescription,
+    images: [ogImage],
+  },
+  icons: {
+    icon: ogImage,
+    apple: ogImage,
+  },
 };
 
 export default function RootLayout({

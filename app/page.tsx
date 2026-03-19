@@ -68,7 +68,7 @@ export default function Home() {
           <div className="space-y-8 z-10">
        
             <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1] text-on-background">
-              Mental Wellness &amp; Productivity,{' '}
+              Mental Wellness for Students,{' '}
               <span className="text-primary">Uncomplicated.</span>
             </h1>
             <p className="text-xl md:text-2xl text-on-surface-variant max-w-xl leading-relaxed">
@@ -116,7 +116,7 @@ export default function Home() {
                 <Image
                   alt="App interface focus timer"
                   className="w-full h-full object-cover rounded-[2.5rem]"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVCqINJ80My90W8AWTCCwFLChJLpaNgOakYOSPHtZgEjCb9QEC7EGJ6mFBzBoVsPPcnLytQqfMoeiowpRA74rHFl5YbZnUibZNI66dIJimTdOmRQ-soU-vJBJGLVPfZqr0MqipL9Ap2jUY6WtBso_RpmnQyraq14EnQnLXi6MNb1BHsGIP8dKFNfIDuJ9tsHfv9ZMC6wudRegzhqMgPAliYT_S4Mg6fm9FhF3UVCx6FcZnsYCb6w0s1USq8H7mfY423xNArYRL58EC"
+                  src="/screen2.png"
                   fill
                   sizes="(max-width: 768px) 60vw, 30vw"
                 />
@@ -125,7 +125,7 @@ export default function Home() {
                 <Image
                   alt="App interface community"
                   className="w-full h-full object-cover rounded-[2.5rem]"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_TdlMVa9-NIQyyCg7zu4XOkEUKP3IowMWIB_U89vc8xB38Zu0YWuBBaq2LbC_LXelMBM5EKA7lgirWEDkFqu2csAklri-yLybsQouap0F-Ur_jvjJlXibLiQBnqYS7mjVDaLN8qWTgRQDpG8mS2RHcLudCsik7UOBLOkQRwVDMkk4rnaGE9oelBiR4wH4tdFf36zOJN1MLXRAQZKdM3bIU_fMFLwsIm-4FayRhS9IX9fR289Qz96msKSBC2hDTK9_EtHuDpY_XVZJ"
+                  src="/scrren1.png"
                   fill
                   sizes="(max-width: 768px) 60vw, 30vw"
                 />
