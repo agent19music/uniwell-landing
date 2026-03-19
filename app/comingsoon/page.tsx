@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { CheckCircleIcon } from '@phosphor-icons/react';
+import { CheckCircle, ArrowLeft } from '@phosphor-icons/react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const funMessages = [
   "Uh oh, someone's eager!",
-  "Nah, let him cook...",
+  'Nah, let him cook...',
   "It's working on my computer, gimme a sec to push to prod",
 ];
 
@@ -22,44 +22,40 @@ export default function ComingSoon() {
   const router = useRouter();
 
   useEffect(() => {
-    // Pick a random message on mount
-    const randomMessage = funMessages[Math.floor(Math.random() * funMessages.length)];
+    const randomMessage =
+      funMessages[Math.floor(Math.random() * funMessages.length)];
     setMessage(randomMessage);
   }, []);
 
-  // Validate email on change
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setIsValidEmail(emailRegex.test(email));
-    if (email && !emailRegex.test(email)) {
-      setError('');
-    } else {
-      setError('');
-    }
+    setError('');
   }, [email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!isValidEmail) {
       setError('Please enter a valid email address');
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
-      const { data, error: supabaseError } = await supabase
+      const { error: supabaseError } = await supabase
         .from('uniwell_waitlist')
-        .insert([
-          { email: email.toLowerCase().trim() }
-        ])
+        .insert([{ email: email.toLowerCase().trim() }])
         .select();
 
       if (supabaseError) {
-        // Check if it's a unique constraint violation
-        if (supabaseError.code === '23505' || supabaseError.message.includes('duplicate') || supabaseError.message.includes('unique')) {
+        if (
+          supabaseError.code === '23505' ||
+          supabaseError.message.includes('duplicate') ||
+          supabaseError.message.includes('unique')
+        ) {
           setError('Someone already gave us that email');
         } else {
           setError('Something went wrong. Please try again.');
@@ -69,7 +65,12 @@ export default function ComingSoon() {
         return;
       }
 
-      // Success
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim() }),
+      }).catch((err) => console.error('Notification error:', err));
+
       setIsLoading(false);
       setIsSubmitted(true);
     } catch (err) {
@@ -80,113 +81,108 @@ export default function ComingSoon() {
   };
 
   return (
-    <main className="flex min-h-screen bg-[#fbeee3] items-center justify-center p-4 md:p-5">
-      {/* Logo in top left */}
-      <header className="absolute top-4 left-4 md:top-5 md:left-10">
-        <div className="flex flex-row items-center" onClick={() => router.push('/')}>
-          <Image
-            src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/uniwell-logo-nobg.png"
-            alt="UniWell Logo"
-            width={40}
-            height={40}
-            className="md:w-[60px] md:h-[60px]"
-          />
-          <h1 className="text-xl md:text-2xl font-semibold text-[#212121] ml-2" style={{ fontFamily: 'Helvetica' }}>
-            UniWell
-          </h1>
-        </div>
+    <main className="flex min-h-screen bg-surface text-on-surface font-body items-center justify-center p-4 md:p-6 selection:bg-primary-container">
+      {/* Nav */}
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full px-6 py-3 bg-surface/80 backdrop-blur-md flex justify-between items-center z-50 bento-shadow">
+        <Link
+          href="/"
+          className="font-headline font-extrabold text-on-background tracking-tighter text-2xl"
+        >
+          Uniwell
+        </Link>
+        <button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 font-headline font-bold text-on-surface-variant hover:text-on-background transition-colors px-4 py-2 rounded-full text-sm"
+        >
+          <ArrowLeft size={16} weight="bold" />
+          Back Home
+        </button>
       </header>
 
-      {/* Main content */}
+      {/* Content */}
       <div className="max-w-2xl w-full text-center px-4">
         {!isSubmitted ? (
-          <>
-            {/* Emoji or Icon */}
-            <div className="text-5xl md:text-7xl mb-6 md:mb-8 animate-bounce">👀</div>
+          <div className="space-y-8">
 
-            {/* Heading */}
-            <h2 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#212121] mb-4 md:mb-6 tracking-tight px-2"
-              style={{ fontFamily: 'Helvetica' }}
-            >
+
+            <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-on-background tracking-tighter leading-[1.1]">
               {message || "Uh oh, someone's eager!"}
-            </h2>
+            </h1>
 
-            {/* Subheading */}
-            <p className="text-base md:text-xl text-[#4A4A4A] mb-8 md:mb-12 leading-relaxed max-w-xl mx-auto px-2">
-              We&apos;re putting the finishing touches on something special. 
-              UniWell will launch in the coming weeks.
+            <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-xl mx-auto">
+              We&apos;re putting the finishing touches on your mental wellness
+              companion. Uniwell launches in the coming weeks.
             </p>
 
-            {/* Email form */}
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto px-2">
-              <div className="flex flex-col sm:flex-row gap-3 mb-2">
+            <form
+              onSubmit={handleSubmit}
+              className="max-w-md mx-auto space-y-3 pt-4"
+            >
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className={`flex-1 px-4 md:px-6 py-3 md:py-4 rounded-full border-2 ${
-                    error ? 'border-red-500' : 'border-[#212121]'
-                  } bg-white text-[#212121] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#212121] focus:border-transparent text-sm md:text-base`}
-                  style={{ fontFamily: 'Helvetica' }}
+                  className={`flex-1 px-6 py-4 rounded-full bg-surface-container-lowest text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary bento-shadow text-base ${
+                    error
+                      ? 'ring-2 ring-error'
+                      : 'border border-outline-variant/30'
+                  }`}
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !isValidEmail || !email}
-                  className="px-6 md:px-8 py-3 md:py-4 bg-[#212121] text-white rounded-full font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-sm md:text-base"
+                  className="aura-gradient text-white px-8 py-4 rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap"
                 >
                   {isLoading ? 'Joining...' : 'Join Waitlist'}
                 </button>
               </div>
               {error && (
-                <p className="text-sm text-red-500 mb-2 text-left px-2">
-                  {error}
-                </p>
+                <p className="text-sm text-error text-left px-2">{error}</p>
               )}
-              <p className="text-xs md:text-sm text-[#4A4A4A]">
-                We&apos;ll notify you when we launch and share exclusive updates
+              <p className="text-xs text-on-surface-variant">
+                We&apos;ll notify you when we launch and share exclusive early
+                access
               </p>
             </form>
-          </>
+          </div>
         ) : (
-          <>
-            {/* Success state */}
-            <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl max-w-lg mx-auto">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-[#4CAF50] rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
-                <CheckCircleIcon size={40} weight="bold" className="text-white md:hidden" />
-                <CheckCircleIcon size={48} weight="bold" className="text-white hidden md:block" />
-              </div>
-              
-              <h2 
-                className="text-2xl md:text-4xl font-bold text-[#212121] mb-3 md:mb-4"
-                style={{ fontFamily: 'Helvetica' }}
-              >
-                You&apos;re on the list!
-              </h2>
-              
-              <p className="text-base md:text-lg text-[#4A4A4A] mb-4 md:mb-6">
-                Thanks for joining our waitlist. We&apos;ll send you an email at{' '}
-                <span className="font-semibold text-[#212121] break-all">{email}</span> when we launch.
-              </p>
-              
-              <button
-                onClick={() => router.push('/')}
-                className="px-6 md:px-8 py-3 text-[#212121] rounded-full font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121] text-sm md:text-base"
-              >
-                Back to Home
-              </button>
+          <div className="bg-surface-container-lowest rounded-xl p-10 md:p-14 bento-shadow max-w-lg mx-auto space-y-6">
+            <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle size={40} weight="bold" className="text-white" />
             </div>
-          </>
+
+            <h2 className="font-headline text-3xl md:text-4xl font-extrabold text-on-background tracking-tight">
+              You&apos;re on the list!
+            </h2>
+
+            <p className="text-lg text-on-surface-variant">
+              Thanks for joining. We&apos;ll reach out when Uniwell is ready.
+            </p>
+            <p className="font-bold text-on-surface break-all text-base bg-surface-container rounded-lg px-4 py-3">
+              {email}
+            </p>
+
+            <button
+              onClick={() => router.push('/')}
+              className="bg-surface-container-high text-on-surface px-8 py-3 rounded-full font-bold hover:bg-surface-container-highest transition-all duration-200"
+            >
+              Back to Home
+            </button>
+          </div>
         )}
       </div>
 
-      {/* Footer text */}
-      <footer className="absolute bottom-4 md:bottom-8 text-center w-full px-4">
-        <p className="text-xs md:text-sm text-[#4A4A4A]">
+      {/* Footer */}
+      <footer className="fixed bottom-6 text-center w-full px-4">
+        <p className="text-xs text-on-surface-variant">
           Questions? Reach us at{' '}
-          <a href="mailto:seanmotanya@gmail.com" className="text-[#212121] font-semibold hover:underline">
+          <a
+            href="mailto:seanmotanya@gmail.com"
+            className="font-bold text-primary hover:text-primary-dim transition-colors"
+          >
             seanmotanya@gmail.com
           </a>
         </p>

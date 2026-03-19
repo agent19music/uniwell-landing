@@ -1,382 +1,333 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Footer from '../components/Footer';
+import React from 'react';
 import Image from 'next/image';
-import { CheckIcon, BookOpenTextIcon, HeartStraightIcon, UsersThreeIcon, X } from '@phosphor-icons/react';
-import QRCode from 'react-qr-code';
 import { useRouter } from 'next/navigation';
+import {
+  Timer,
+  FirstAid,
+  UsersThree,
+  GraduationCap,
+  Star,
+  DownloadSimple,
+} from '@phosphor-icons/react';
+import QRCode from 'react-qr-code';
+import Navbar from '@/components/Navbar';
+import SiteFooter from '@/components/SiteFooter';
 
-// Mock data for slides (you can move this to a separate file)
-const onboardingSlides = [
+const testimonials = [
   {
-    id: 'slide1',
-    title: 'Boost Your Productivity',
-    description: 'Stay on track with study timers, focus sessions, and goal tracking tools.',
-    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/productivityillustration-removebg.png',
-    backgroundColor: '#E6F3FF',
-    icon: 'check-circle',
+    quote:
+      "Finally an app that doesn't just ping me about deadlines but actually helps me breathe when I'm overwhelmed. The study circles changed my life.",
+    name: 'Amina',
+    school: 'University of Nairobi',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBGmwR7_BcKOSAONoyZEKYZ52eRZvMUYBWjY28wf1THJRZrBpD6np0ug4kLzoa2U9gzGVLXHpJD7DkiXZaDkEOaOGlW7EbFEweXxm3ZXkqgdAEyYLzXzfQTUEEcwDG5-5dnmto4RQ8ot_que0RbaxQPyzhnuCO2J3UJBGPAAMh56Nn3yIxLfM9Yoe3WdnySDF_YNYTgUh3ZQ539c82rOdxopyMrhyH7yE4AH1Uz_F4BZrD1v8ayuviGfr7rcu6Gimny3LzFaDX_Y-LE',
+    bgClass: 'bg-surface-container',
   },
   {
-    id: 'slide2',
-    title: 'Professional Support',
-    description: 'Book counseling appointments, browse mental health resources, and access crisis support.',
-    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/caregiver-prod.png',
-    backgroundColor: '#FFF1E6',
-    icon: 'heart',
+    quote:
+      "The professional counseling feature is seamless. No more waiting months for the university's health services.",
+    name: 'Brian',
+    school: 'Strathmore University',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuA6zKz-vCvT7DpuzURBW3OK7-STL8jPGVIiFAI9EnEioa1Ro8pNu4_sb3xionwUkWvPF3kP0Lr6P36XoMzHJqkb31DWICNnBAOhftdii-sVzWnoVsCVmXhZEpg0hC8FqlHjLWucne7Cck7lkFr4b0_m7oSt755XtIVQ0IYtBGwVpq7mb1CZr5kaVYgGRILLcGa_1YNgkUByb_VsmR7qxgST4Eu5zIu41RokxS-y-xaxHA7fhxi3Iccjbn5iYqMIRFtSPEvYUddffON6',
+    bgClass: 'bg-tertiary-fixed-dim/10',
   },
   {
-    id: 'slide3',
-    title: 'Join the Community',
-    description: 'Connect with peers through discussion forums, group activities, and anonymous sharing.',
-    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/communityillustration-removebg.png',
-    backgroundColor: '#E6FFE9',
-    icon: 'users',
-  },
-  {
-    id: 'slide4',
-    title: 'Learn & Grow',
-    description: 'Access resources, workshops, and tools to support your mental wellness journey.',
-    imageSource: 'https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/selfcareillustration-removebg.png',
-    backgroundColor: '#FFE6F0',
-    icon: 'book',
+    quote:
+      "The library feature is the only one I've stuck with. The resources on how navigate adult relationships are very helpful.",
+    name: 'Wanjiku',
+    school: 'Kenyatta University',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDZRDyGL0i9GPl-8lHRbRz72FKsXMk4MCHGRbTPCCqutGraLAV5uWwppYDurKNOBS2UpMzmEJEw4IazYNQClMxB3MR0SZV02ISShKTwULAogaH-zDRwQDzSsccr8uTnp6MfKnKXQlLVY3-eAXLo0fjFp3qtHWejKWfWFJK9lj8QNRDY4rOfMpEjjSH852IYeKZYZH5p5s5f8iTxh4i7wdfTrlcoyRdX4RvtkyFIdDn5_-qDszqb2QN2heUFONob6BHrLzhgyOqnpxVu',
+    bgClass: 'bg-secondary-fixed-dim/10',
   },
 ];
 
-interface Position {
-  rotate: number;
-  translateX: number;
-  translateY: number;
-  zIndex: number;
-  scale: number;
-  opacity: number;
-}
-
-// Icon component using Phosphor icons
-const Icon = ({ name, size = 32, className = '' }: { name: string; size?: number; className?: string }) => {
-  const iconProps = { size, className, weight: 'bold' as const };
-  
-  switch (name) {
-    case 'check-circle':
-      return <CheckIcon {...iconProps} />;
-    case 'heart':
-      return <HeartStraightIcon {...iconProps} />;
-    case 'users':
-      return <UsersThreeIcon {...iconProps} />;
-    case 'book':
-      return <BookOpenTextIcon {...iconProps} />;
-    default:
-      return <CheckIcon {...iconProps} />;
-  }
-};
+const avatars = [
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA814oTqNnm2cGl-NUpuZkzkNnSHWgSPdvPhyuFmH9zzeWhQahhd2g1ot7Mk_Dk2hKlp1Q0NpiZpA2riFdemQTZq_9OGKtRNjA6EBpNkvuefj112MsaytKdTv5nTHBNmP5Iuf4mmjpNgH43zZ2KLDXvHe7ygb8Vbm7M-MtmRFLNTJHBTUh0sMS25psyOuUQTJPmt41VlROcMlI2MtSotfuHW8SJPXfRtQXCuKoj1GS-F3487xyATnAjliswiqi4dlhtg9sVL6Lu_1of',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuBjjkJeK8eRO5KKicFcLssN5Gueob3PdZFzeuixqI5MeY--EYDWEvoTFaL1jYk1N48oA0RiLhdOnbdq0i0wTSGmj76Ei6X7GvaWmus6CAcUdqEqrAElkL4qArEdDYF4hGszZByn3wu6Ib8smfm6GIlFnCnIyj0L__pkfCfl6V_zlpilsBqCNY6I3Ms_Lt28sS6Tb89IkUWa0PEG56hQ-6bA52mmo1H3MZ2i9wOHZ2HYUA3uEAKrsryARGNSHwUb38ReJ5Rn_e4UFhZH',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuCkPwoeactLig4ltb5ZL-23MtfM_UlA11TaIsJ_fEMvSyYiVQkFeM0PJLn7S4yLvB0Oa8-xR6Onb0n2wHHTUj7OhffjcUqwrHLTIsmcQQlHzi14CCaDtfzlbGnrS4OFu5pIwfBO7Pw5acGi0mJT3uMTu64XLrnyHhRX3cbCiByEBD75v-rfawZu4kKPFpcvw_F-C3jM2Xn-sHeTPBm45ssWE1EzlVhbVDIVr7Hy8zKs-fMKmPd5brn7oqjcbtRNT_2Y1KyyoyP6ItlU',
+];
 
 export default function Home() {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [slides] = useState(onboardingSlides);
-  const [isAnimated, setIsAnimated] = useState(false);
-  const [mockupPositions, setMockupPositions] = useState<Position[]>([]);
-  const [showDownloadDialog, setShowDownloadDialog] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
-  // Initialize animations
-  useEffect(() => {
-    setIsAnimated(true);
-    setMockupPositions(getMockupPositions(0));
-    
-    // Check if mobile
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const safeSlidesForAnimation = slides.slice(0, 4);
-
   const handleGetStarted = () => {
-    // On mobile, redirect to coming soon page
-    if (isMobile) {
-      router.push('/comingsoon');
-    } else {
-      setShowDownloadDialog(true);
-    }
-  };
-
-  const handleDownload = () => {
     router.push('/comingsoon');
   };
 
-  // Function to handle advancing to the next mockup
-  const handleNextMockup = () => {
-    if (!safeSlidesForAnimation.length) return;
-    const maxIndex = safeSlidesForAnimation.length - 1;
-    const nextIndex = activeIndex >= maxIndex ? 0 : activeIndex + 1;
-    setActiveIndex(nextIndex);
-    setMockupPositions(getMockupPositions(nextIndex));
-  };
-
-  // Function to handle selecting a specific mockup
-  const handleSelectMockup = (index: number) => {
-    if (!safeSlidesForAnimation.length) return;
-    if (index !== activeIndex) {
-      setActiveIndex(index);
-      setMockupPositions(getMockupPositions(index));
-    }
-  };
-
-  // Enhanced getMockupPositions function for improved stacking and visibility
-  const getMockupPositions = (activeIdx: number): Position[] => {
-    const largeSpread = 220;
-    
-    // Using a higher z-index value for active item to ensure it's always on top
-    const ACTIVE_Z_INDEX = 10;
-    const BEHIND_Z_INDEX = 3;
-    const FAR_BEHIND_Z_INDEX = 2;
-    const FARTHEST_Z_INDEX = 1;
-    
-    if (activeIdx === 0) {
-      return [
-        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
-        { rotate: 12, translateX: largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-        { rotate: 20, translateX: largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
-        { rotate: 28, translateX: largeSpread * 2.2, translateY: 120, zIndex: FARTHEST_Z_INDEX, scale: 0.65, opacity: 0.5 },
-      ];
-    } else if (activeIdx === 1) {
-      return [
-        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
-        { rotate: 12, translateX: largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-        { rotate: 20, translateX: largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
-      ];
-    } else if (activeIdx === 2) {
-      return [
-        { rotate: -20, translateX: -largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
-        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
-        { rotate: 12, translateX: largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-      ];
-    } else if (activeIdx === 3) {
-      return [
-        { rotate: -28, translateX: -largeSpread * 2.2, translateY: 120, zIndex: FARTHEST_Z_INDEX, scale: 0.65, opacity: 0.5 },
-        { rotate: -20, translateX: -largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
-        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
-      ];
-    } else {
-      return [
-        { rotate: -28, translateX: -largeSpread * 2.2, translateY: 120, zIndex: FARTHEST_Z_INDEX, scale: 0.65, opacity: 0.5 },
-        { rotate: -20, translateX: -largeSpread * 1.6, translateY: 80, zIndex: FAR_BEHIND_Z_INDEX, scale: 0.75, opacity: 0.7 },
-        { rotate: -12, translateX: -largeSpread, translateY: 40, zIndex: BEHIND_Z_INDEX, scale: 0.85, opacity: 0.9 },
-        { rotate: 0, translateX: 0, translateY: 0, zIndex: ACTIVE_Z_INDEX, scale: 1, opacity: 1 },
-      ];
-    }
-  };
-
-  const renderMockups = () => {
-    if (!safeSlidesForAnimation.length || mockupPositions.length === 0) {
-      return <div className="h-[500px] md:h-[600px] lg:h-[700px] w-full relative flex items-center justify-center" />;
-    }
-    
-    return (
-      <div className="h-[500px] md:h-[600px] lg:h-[700px] w-full relative flex items-center justify-center mb-5 scale-75 md:scale-90 lg:scale-100">
-        {safeSlidesForAnimation.map((slide, index) => {
-          const position = mockupPositions[index] || { rotate: 0, translateX: 0, translateY: 0, zIndex: 1, scale: 1, opacity: 1 };
-          
-          return (
-            <button
-              key={slide.id}
-              onClick={() => handleSelectMockup(index)}
-              className="absolute cursor-pointer transition-all duration-[650ms] ease-out"
-              style={{
-                transform: `translateX(${position.translateX}px) translateY(${position.translateY}px) rotate(${position.rotate}deg) scale(${position.scale})`,
-                zIndex: position.zIndex,
-                opacity: position.opacity,
-              }}
-            >
-              <div
-                className={`transition-shadow duration-300 ${
-                  index === activeIndex
-                    ? 'shadow-[0_20px_30px_rgba(0,0,0,0.3)]'
-                    : 'shadow-[0_12px_20px_rgba(0,0,0,0.2)]'
-                }`}
-              >
-                {/* Mockup with image */}
-                <div
-                  className="w-[280px] md:w-[300px] h-[450px] md:h-[500px] rounded-3xl p-5 md:p-6 flex flex-col items-center justify-center overflow-hidden"
-                  style={{ backgroundColor: index === 0 ? '#ffa07a' : '#212121' }}
-                >
-                  <div className="w-full flex-1 flex items-center justify-center mb-3 md:mb-4">
-                    <Image
-                      src={slide.imageSource}
-                      alt={slide.title}
-                      width={180}
-                      height={180}
-                      className="object-contain md:w-[200px] md:h-[200px]"
-                    />
-                  </div>
-                  <h3 className="text-white text-lg md:text-xl font-bold mb-2 text-center">{slide.title}</h3>
-                  <p className="text-white/80 text-xs md:text-sm text-center line-clamp-3">{slide.description}</p>
-                </div>
-              </div>
-            </button>
-          );
-        })}
-        
-        {/* Next button */}
-        <div className="absolute bottom-[30px] z-20">
-          <button
-            onClick={handleNextMockup}
-            className="bg-[#212121] w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:translate-y-1"
-          >
-            <span className="text-white text-xl md:text-2xl font-bold">→</span>
-          </button>
-        </div>
-      </div>
-    );
-  };
-  
   return (
-    <main className="flex-1 bg-[#fbeee3] min-h-screen">
-      <div className="pb-[60px]">
-        {/* Logo Header */}
-        <header className="absolute top-5 left-10 z-10">
-          <div className="flex flex-row items-center scale-75 md:scale-100 origin-left">
-            <Image
-              src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/uniwell-logo-nobg.png"
-              alt="UniWell Logo"
-              width={40}
-              height={40}
-            />
-            <h1 className="text-xl md:text-2xl font-semibold text-[#212121] ml-2" style={{ fontFamily: 'Helvetica' }}>UniWell</h1>
-          </div>
-        </header>
+    <main className="bg-surface text-on-surface font-body selection:bg-primary-container">
+      <Navbar />
 
-        <div className="flex-1 flex items-center flex-col p-5">
-          {/* Header Section */}
-          <div className={`mt-[100px] md:mt-[120px] mb-[50px] md:mb-[60px] flex items-center justify-center max-w-[900px] w-full px-5 mx-auto transition-all duration-800 ${isAnimated ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
-            <div className="w-full">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center w-full mb-3 md:mb-4 text-[#212121] tracking-tight" style={{ fontFamily: 'Helvetica' }}>
-                Mental Wellness for Students
-              </h2>
-              <p className="text-base md:text-lg lg:text-xl text-center text-[#4A4A4A] leading-[28px] max-w-[700px] w-full mx-auto font-normal">
-                Tools and resources to help students thrive academically and emotionally
+      {/* Hero */}
+      <section className="relative min-h-screen pt-32 pb-20 px-6 md:px-12 flex flex-col items-center overflow-hidden">
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8 z-10">
+       
+            <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1] text-on-background">
+              Mental Wellness &amp; Productivity,{' '}
+              <span className="text-primary">Uncomplicated.</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-on-surface-variant max-w-xl leading-relaxed">
+              Turn academic stress into manageable steps. Uniwell combines focus
+              timers, peer community, and professional support in one app built
+              for your brain.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <button
+                onClick={handleGetStarted}
+                className="aura-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:scale-105 transition-all duration-200"
+              >
+                Get Started for Free
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="bg-surface-container-high text-on-surface px-8 py-4 rounded-full text-lg font-bold hover:bg-surface-container-highest transition-all duration-200"
+              >
+                Watch Demo
+              </button>
+            </div>
+            <div className="flex items-center gap-4 pt-6">
+              <div className="flex -space-x-3">
+                {avatars.map((src, i) => (
+                  <Image
+                    key={i}
+                    alt={`User ${i + 1}`}
+                    className="w-10 h-10 rounded-full border-2 border-surface"
+                    src={src}
+                    width={40}
+                    height={40}
+                  />
+                ))}
+              </div>
+              <p className="text-sm font-medium text-on-surface-variant">
+                Trusted by students worldwide
               </p>
             </div>
           </div>
 
-          {/* Mockups Section */}
-          {renderMockups()}
-
-          {/* CTA Buttons */}
-          <div className="flex flex-row justify-center gap-3 md:gap-4 my-8 md:my-12 flex-wrap">
-            <button 
-              onClick={handleGetStarted}
-              className="px-6 md:px-8 py-3 md:py-4 bg-[#212121] text-white rounded-full text-sm md:text-base font-semibold hover:bg-[#333] transition-all shadow-lg hover:shadow-xl"
-            >
-              Get Started →
-            </button>
-            <button
-              onClick={() => router.push('/comingsoon')}
-            className="px-6 md:px-8 py-3 md:py-4 bg-white text-[#212121] rounded-full text-sm md:text-base font-semibold hover:bg-gray-100 transition-all border-2 border-[#212121]">
-              Learn More
-            </button>
+          <div className="relative h-[500px] md:h-[600px] w-full flex items-center justify-center">
+            <div className="absolute inset-0 bg-primary-container/20 blur-[120px] rounded-full scale-75" />
+            <div className="relative w-full h-full">
+              <div className="absolute top-10 right-0 w-2/3 aspect-[9/19] bg-surface-container-lowest rounded-[3rem] bento-shadow p-3 rotate-6 z-20 overflow-hidden border-8 border-on-background/5">
+                <Image
+                  alt="App interface focus timer"
+                  className="w-full h-full object-cover rounded-[2.5rem]"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVCqINJ80My90W8AWTCCwFLChJLpaNgOakYOSPHtZgEjCb9QEC7EGJ6mFBzBoVsPPcnLytQqfMoeiowpRA74rHFl5YbZnUibZNI66dIJimTdOmRQ-soU-vJBJGLVPfZqr0MqipL9Ap2jUY6WtBso_RpmnQyraq14EnQnLXi6MNb1BHsGIP8dKFNfIDuJ9tsHfv9ZMC6wudRegzhqMgPAliYT_S4Mg6fm9FhF3UVCx6FcZnsYCb6w0s1USq8H7mfY423xNArYRL58EC"
+                  fill
+                  sizes="(max-width: 768px) 60vw, 30vw"
+                />
+              </div>
+              <div className="absolute top-40 left-0 w-2/3 aspect-[9/19] bg-surface-container-lowest rounded-[3rem] bento-shadow p-3 -rotate-12 z-10 overflow-hidden border-8 border-on-background/5">
+                <Image
+                  alt="App interface community"
+                  className="w-full h-full object-cover rounded-[2.5rem]"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_TdlMVa9-NIQyyCg7zu4XOkEUKP3IowMWIB_U89vc8xB38Zu0YWuBBaq2LbC_LXelMBM5EKA7lgirWEDkFqu2csAklri-yLybsQouap0F-Ur_jvjJlXibLiQBnqYS7mjVDaLN8qWTgRQDpG8mS2RHcLudCsik7UOBLOkQRwVDMkk4rnaGE9oelBiR4wH4tdFf36zOJN1MLXRAQZKdM3bIU_fMFLwsIm-4FayRhS9IX9fR289Qz96msKSBC2hDTK9_EtHuDpY_XVZJ"
+                  fill
+                  sizes="(max-width: 768px) 60vw, 30vw"
+                />
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          {/* Features Section */}
-          <div className="flex flex-row flex-wrap justify-center max-w-[1200px] my-[40px] md:my-[60px] gap-6 md:gap-8">
-            {slides.map((slide, index) => (
-              <div key={slide.id} className="w-[280px] md:w-[300px] p-4 md:p-5 flex items-center flex-col">
-                <div
-                  className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-5 md:mb-6 flex justify-center items-center"
-                  style={{ backgroundColor: index === 0 ? '#ffa07a' : '#212121' }}
-                >
-                  <Icon name={slide.icon} size={28} className="text-white md:hidden" />
-                  <Icon name={slide.icon} size={32} className="text-white hidden md:block" />
-                </div>
-                <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-center text-[#212121]">
-                  {slide.title}
+      {/* How it Works - Bento Grid */}
+      <section
+        className="py-24 px-6 md:px-12 bg-surface-container-low"
+        id="how-it-works"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-16 text-center lg:text-left">
+            <h2 className="font-headline text-4xl md:text-6xl font-extrabold tracking-tight text-on-background mb-6">
+              Designed for your{' '}
+              <span className="text-secondary">well-being.</span>
+            </h2>
+            <p className="text-on-surface-variant text-xl max-w-2xl">
+              The four pillars that make Uniwell your ultimate academic
+              sanctuary.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+            {/* Focus & Productivity */}
+            <div className="md:col-span-8 bg-surface-container-lowest rounded-xl p-10 bento-shadow group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between min-h-[400px]">
+              <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mb-8">
+                <Timer size={28} weight="bold" className="text-on-primary-fixed" />
+              </div>
+              <div>
+                <h3 className="font-headline text-3xl font-bold mb-4">
+                  Focus &amp; Productivity
                 </h3>
-                <p className="text-sm md:text-base text-center text-[#4A4A4A] leading-6">
-                  {slide.description}
+                <p className="text-on-surface-variant text-lg leading-relaxed max-w-md">
+                  Smart pomodoros and deep work sessions that adapt to your
+                  fatigue levels. Gamify your study habits without the burnout.
                 </p>
+              </div>
+              <div className="mt-8 overflow-hidden rounded-lg h-32 bg-surface-container">
+                <div className="flex gap-2 p-4 animate-pulse">
+                  <div className="h-full w-24 bg-primary-container/20 rounded-lg" />
+                  <div className="h-full w-24 bg-primary-container/40 rounded-lg" />
+                  <div className="h-full w-32 bg-primary-container/60 rounded-lg" />
+                </div>
+              </div>
+            </div>
+
+            {/* Professional Support */}
+            <div className="md:col-span-4 bg-error-container/10 rounded-xl p-10 bento-shadow group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between">
+              <div className="w-16 h-16 rounded-full bg-error-container/20 flex items-center justify-center mb-8">
+                <FirstAid size={28} weight="bold" className="text-error" />
+              </div>
+              <div>
+                <h3 className="font-headline text-2xl font-bold mb-4">
+                  Professional Support
+                </h3>
+                <p className="text-on-surface-variant leading-relaxed">
+                  Round-the-clock access to licensed counselors specifically
+                  trained in student mental health.
+                </p>
+              </div>
+            </div>
+
+            {/* Campus Community */}
+            <div className="md:col-span-5 bg-tertiary-fixed-dim/20 rounded-xl p-10 bento-shadow group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between min-h-[350px]">
+              <div className="w-16 h-16 rounded-full bg-tertiary-fixed-dim flex items-center justify-center mb-8">
+                <UsersThree
+                  size={28}
+                  weight="bold"
+                  className="text-on-tertiary-fixed"
+                />
+              </div>
+              <div>
+                <h3 className="font-headline text-2xl font-bold mb-4">
+                  Campus Community
+                </h3>
+                <p className="text-on-surface-variant leading-relaxed">
+                  Join study circles or wellness groups with peers who understand
+                  exactly what you&apos;re going through.
+                </p>
+              </div>
+            </div>
+
+            {/* Learn & Grow */}
+            <div className="md:col-span-7 bg-secondary-fixed-dim/20 rounded-xl p-10 bento-shadow group hover:scale-[1.02] transition-all duration-200 flex flex-col justify-between">
+              <div className="w-16 h-16 rounded-full bg-secondary-fixed-dim flex items-center justify-center mb-8">
+                <GraduationCap
+                  size={28}
+                  weight="bold"
+                  className="text-on-secondary-fixed"
+                />
+              </div>
+              <div>
+                <h3 className="font-headline text-2xl font-bold mb-4">
+                  Learn &amp; Grow
+                </h3>
+                <p className="text-on-surface-variant text-lg leading-relaxed">
+                  Micro-learning modules on emotional intelligence, sleep
+                  hygiene, and financial wellness for students.
+                </p>
+              </div>
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="p-4 bg-white/50 rounded-lg font-bold text-sm">
+                  Sleep Hygiene 101
+                </div>
+                <div className="p-4 bg-white/50 rounded-lg font-bold text-sm">
+                  Exam Anxiety
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-24 px-6 overflow-hidden" id="testimonials">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="font-headline text-4xl text-center font-extrabold tracking-tight mb-16">
+            Loved by students at universities everywhere.
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t) => (
+              <div
+                key={t.name}
+                className={`${t.bgClass} rounded-xl p-8 bento-shadow flex flex-col`}
+              >
+                <div className="flex text-primary mb-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} size={20} weight="fill" />
+                  ))}
+                </div>
+                <p className="italic text-lg text-on-surface mb-6 flex-1">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="flex items-center gap-3 mt-auto pt-4">
+                  <Image
+                    alt={t.name}
+                    className="w-12 h-12 rounded-full"
+                    src={t.avatar}
+                    width={48}
+                    height={48}
+                  />
+                  <div>
+                    <p className="font-bold">{t.name}</p>
+                    <p className="text-xs  font-bold opacity-50">
+                      {t.school}
+                    </p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Footer */}
-        <div className="mt-10 mx-5 pb-10">
-          <Footer />
-          <div className="text-center mt-8">
-            <p className="text-md text-[#4A4A4A] flex items-center justify-center gap-2">
-              Made by an over caffeinated undergrad 
-              <Image 
-                src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/sean_pfp_peace-removebg-preview.png" 
-                alt="Sean" 
-                width={40} 
-                height={40} 
-                className="inline-block rounded-full" 
-              />
-            </p>
+      {/* CTA Banner */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto rounded-xl bg-on-surface text-surface p-12 md:p-20 flex flex-col items-center text-center relative overflow-hidden bento-shadow">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div className="absolute top-1/4 -left-20 w-80 h-80 border-[40px] border-surface-container rounded-full" />
+            <div className="absolute bottom-1/4 -right-20 w-64 h-64 bg-surface-container-lowest rounded-full" />
           </div>
-        </div>
-      </div>
-
-      {/* Download Dialog */}
-      {showDownloadDialog && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setShowDownloadDialog(false)}
-        >
-          <div 
-            className="bg-[#fbeee3] rounded-3xl shadow-2xl max-w-md w-full p-6 md:p-8 relative mx-auto my-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setShowDownloadDialog(false)}
-              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <X size={24} weight="bold" className="text-[#212121]" />
-            </button>
-
-            {/* Dialog content */}
-            <div className="flex flex-col items-center pt-4">
-              <h3 className="text-xl md:text-2xl font-bold text-[#212121] mb-2 text-center" style={{ fontFamily: 'Helvetica' }}>
-                Download UniWell
-              </h3>
-              <Image
-                src="https://pub-abe4a6405e724602a7fac9bf761e290c.r2.dev/uniwell-logo-nobg.png"
-                alt="UniWell Logo"
-                width={60}
-                height={60}
-                className="mb-4"
-              />
-              <p className="text-[#4A4A4A] text-center mb-6 md:mb-8 text-sm md:text-base">
-                Scan the QR code with your phone
-              </p>
-
-              {/* Desktop: Show QR code */}
-              <div className="bg-white p-4 md:p-6 rounded-2xl border-2 border-gray-200">
+          <div className="relative z-10 flex flex-col items-center">
+            <h2 className="font-headline text-4xl md:text-6xl font-extrabold mb-6 max-w-2xl tracking-tighter">
+              Ready to transform your student life?
+            </h2>
+            <p className="text-xl opacity-80 mb-12 max-w-lg">
+              Join the growing wave of students prioritizing their mental
+              health without sacrificing grades.
+            </p>
+            {/* Desktop: QR Code */}
+            <div className="hidden md:flex flex-col items-center bg-white/10 backdrop-blur-xl p-8 rounded-xl border border-white/20 shadow-2xl">
+              <div className="bg-white p-4 rounded-lg mb-6">
                 <QRCode
-                  value={'https://uniwell.seanmotanya.dev/comingsoon'}
-                  size={200}
-                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                  viewBox={`0 0 200 200`}
+                  value="https://uniwell.seanmotanya.dev/comingsoon"
+                  size={128}
+                  style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
+                  viewBox="0 0 128 128"
                 />
               </div>
-
-              <p className="text-xs md:text-sm text-[#4A4A4A] mt-4 md:mt-6 text-center">
-                Available for iOS and Android
+              <p className="font-bold text-lg mb-2">Scan to Download</p>
+              <p className="text-sm opacity-60">
+                Available on iOS and Android
               </p>
+            </div>
+            {/* Mobile: Download button */}
+            <div className="md:hidden flex flex-col gap-4 w-full max-w-sm">
+              <button
+                onClick={handleGetStarted}
+                className="w-full bg-surface text-on-surface py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200"
+              >
+                <DownloadSimple size={20} weight="bold" />
+                Download Now
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }
